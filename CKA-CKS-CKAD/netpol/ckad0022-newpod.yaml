@@ -1,0 +1,126 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    cni.projectcalico.org/containerID: 13537f9d82bb93e978aa291adee435c673475bffb91ec78c1ab29397a4161e5c
+    cni.projectcalico.org/podIP: ""
+    cni.projectcalico.org/podIPs: ""
+  creationTimestamp: "2024-06-04T14:17:39Z"
+  labels:
+    allow-access: "true"
+  name: ckad0022-newpod
+  namespace: ckad0022
+  resourceVersion: "5925186"
+  uid: 1fe7236d-78b8-4a4c-9c6f-df0508565df8
+spec:
+  containers:
+  - image: nginx
+    imagePullPolicy: Always
+    name: ckad0022-newpod
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-w9h2q
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: skynet
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-w9h2q
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2024-07-04T03:08:31Z"
+    message: 'The node was low on resource: ephemeral-storage. Threshold quantity:
+      75271448290, available: 73371580Ki. Container ckad0022-newpod was using 108Ki,
+      request is 0, has larger consumption of ephemeral-storage. '
+    reason: TerminationByKubelet
+    status: "True"
+    type: DisruptionTarget
+  - lastProbeTime: null
+    lastTransitionTime: "2024-07-04T03:08:31Z"
+    status: "False"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2024-06-04T14:17:39Z"
+    reason: PodCompleted
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2024-07-04T03:08:31Z"
+    reason: PodCompleted
+    status: "False"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2024-07-04T03:08:31Z"
+    reason: PodCompleted
+    status: "False"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2024-06-04T14:17:39Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://a13553f235c8da69eadef4ed06eb259576b3b8ce203a6287286ac49f268b3950
+    image: docker.io/library/nginx:latest
+    imageID: docker.io/library/nginx@sha256:9c367186df9a6b18c6735357b8eb7f407347e84aea09beb184961cb83543d46e
+    lastState:
+      terminated:
+        containerID: containerd://b57eff845ba83f7e3be152d9206f661fde909f10c3c66d7d9cedb6d237532c9f
+        exitCode: 255
+        finishedAt: "2024-07-01T00:53:28Z"
+        reason: Unknown
+        startedAt: "2024-07-01T00:49:17Z"
+    name: ckad0022-newpod
+    ready: false
+    restartCount: 32
+    started: false
+    state:
+      terminated:
+        containerID: containerd://a13553f235c8da69eadef4ed06eb259576b3b8ce203a6287286ac49f268b3950
+        exitCode: 0
+        finishedAt: "2024-07-04T03:08:30Z"
+        reason: Completed
+        startedAt: "2024-07-01T00:53:59Z"
+  hostIP: 192.168.2.221
+  hostIPs:
+  - ip: 192.168.2.221
+  phase: Succeeded
+  qosClass: BestEffort
+  startTime: "2024-06-04T14:17:39Z"

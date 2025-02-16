@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  creationTimestamp: null
+  name: monday-job
+spec:
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: monday-job
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - image: ubuntu
+            name: my-container
+            command: ["ls -la"]
+            resources: {}
+          restartPolicy: OnFailure
+  schedule: '09 * * * 1'  # Every Monday at 9 am
+status: {}

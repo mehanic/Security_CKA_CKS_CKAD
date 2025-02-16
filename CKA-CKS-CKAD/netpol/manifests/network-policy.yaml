@@ -1,0 +1,24 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  # Name the network policy
+  name: hello-server-allow-from-hello-client
+spec:
+
+  # Define this as an ingress rule which allows us to restrict access to a set of pods.
+  policyTypes:
+  - Ingress
+
+  # Defines the set of pods to which this policy applies
+  # In this case, we apply the policy to pods labeled as app=hello-server
+  podSelector:
+    matchLabels:
+      app: hello-server
+
+  # Define the sources allowed by this policy
+  # In this case, we allow ingress from all pods labeled as app=hello
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: hello

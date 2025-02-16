@@ -1,0 +1,21 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: database-policy
+  namespace: default
+spec:
+  endpointSelector:
+    matchLabels:
+      tier: database
+  ingress:
+    - {}
+  egress:
+    - {}
+
+
+#The standard network security posture of Kubernetes allows all network traffic. 
+#We can restrict all communication by introducing a “default deny” posture and allowing only
+# the desired network communication. When a rule selects an endpoint, and we specify the traffic 
+# direction(i.e. ingress or egress), the endpoint automatically enters a default deny mode.
+
+#kubectl get cnp #cnp is short for the CiliumNetworkPolicy

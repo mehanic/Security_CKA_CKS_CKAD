@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: my-cronjob
+  namespace: cronjob
+spec:
+  schedule: "*/5 * * * *" # Every 5 minutes
+  jobTemplate:
+    spec:
+      backoffLimit: 3 # Maximum number of retries before considering a Job as failed
+      activeDeadlineSeconds: 10 # Time limit for each pod
+      completions: 3 # Number of successful completions needed
+      parallelism: 1 # Number of pods running in parallel
+      template:
+        spec:
+          containers:
+          - name: my-container
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - "date; echo Hello from the Kubernetes cluster"
+          restartPolicy: OnFailure
+

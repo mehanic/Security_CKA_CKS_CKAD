@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rebel-base
+  annotations:
+     service.cilium.io/global: "true"
+     # Possible values:
+     # - local
+     #    preferred endpoints from local cluster if available
+     # - remote
+     #    preferred endpoints from remote cluster if available
+     # none (default)
+     #    no preference. Default behavior if this annotation does not exist
+     service.cilium.io/affinity: "local"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    name: rebel-base

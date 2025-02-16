@@ -1,0 +1,26 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "service-rule"
+spec:
+  endpointSelector:
+    matchLabels:
+      id: app2
+  egress:
+  - toServices:
+    # Services may be referenced by namespace + name
+    - k8sService:
+        serviceName: myservice
+        namespace: default
+    # Services may be referenced by namespace + label selector
+    - k8sServiceSelector:
+        selector:
+          matchLabels:
+            env: staging
+        namespace: another-namespace
+
+
+#This example shows how to allow all endpoints with the label id=app2 to talk to
+# all endpoints of kubernetes service myservice in kubernetes namespace default as well
+#  as all services with label env=staging in namespace another-namespace.
+

@@ -1,0 +1,19 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: "cilium-health-checks"
+spec:
+  endpointSelector:
+    matchLabels:
+      'reserved:health': ''
+  ingress:
+    - fromEntities:
+      - remote-node
+  egress:
+    - toEntities:
+      - remote-node
+
+
+# Example: Add Health Endpoint
+# The following example adds the health entity to all Cilium managed endpoints in 
+# order to check cluster connectivity health.

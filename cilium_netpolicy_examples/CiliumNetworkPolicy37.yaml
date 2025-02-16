@@ -1,0 +1,20 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "l4-sni-rule"
+spec:
+  endpointSelector:
+    matchLabels:
+      app: myService
+  egress:
+  - toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+      serverNames:
+      - one.one.one.one
+
+
+#The following rule limits all endpoints with the label app=myService to only be able 
+#to establish TLS connections with one.one.one.one SNI. Any other attempt to another SNI
+# (for example, with cilium.io) will be rejected.

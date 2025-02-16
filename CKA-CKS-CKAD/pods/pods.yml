@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-prod
+  labels:
+    env: prod
+    dept: hr
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.13.6
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-dev
+  labels:
+    env: dev
+    dept: hr
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.13.6
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-qa
+  labels:
+    env: qa
+    dept: hr
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.13.6
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: proxy
+  labels:
+    env: prod
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.13.6

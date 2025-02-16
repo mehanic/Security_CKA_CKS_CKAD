@@ -1,0 +1,16 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: deny-from-other-namespaces
+  namespace: net-experiment
+spec:
+  podSelector:
+    matchLabels:
+  ingress:
+  - from:
+    - podSelector: {}
+
+#namespace: default deploys it to the default namespace.
+#it applies the policy to ALL pods in default namespace as the spec.podSelector.matchLabels is empty and therefore selects all pods.
+#it allows traffic from ALL pods in the default namespace, as spec.ingress.from.podSelector is empty and therefore selects all pods.
+

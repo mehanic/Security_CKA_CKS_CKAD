@@ -1,0 +1,30 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: "lock-down-ingress-worker-node"
+spec:
+  description: "Allow a minimum set of required ports on ingress of worker nodes"
+  nodeSelector:
+    matchLabels:
+      type: ingress-worker
+  ingress:
+  - fromEntities:
+    - remote-node
+    - health
+  - toPorts:
+    - ports:
+      - port: "22"
+        protocol: TCP
+      - port: "6443"
+        protocol: TCP
+      - port: "2379"
+        protocol: TCP
+      - port: "4240"
+        protocol: TCP
+      - port: "8472"
+        protocol: UDP
+
+
+#  the following policy allows ingress traffic for any node with the label type=ingress-worker
+#   on TCP ports 22, 6443 (kube-apiserver), 2379 (etcd), and 4240 (health checks), as well as
+#    UDP port 8472 (VXLAN).

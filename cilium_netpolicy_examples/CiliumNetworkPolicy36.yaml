@@ -1,0 +1,19 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "icmp-rule"
+spec:
+  endpointSelector:
+    matchLabels:
+      app: myService
+  egress:
+  - icmps:
+    - fields:
+      - type: 8
+        family: IPv4
+      - type: EchoRequest
+        family: IPv6
+
+# The following rule limits all endpoints with the label app=myService to only
+#  be able to emit packets using ICMP with type 8 and ICMPv6 with message EchoRequest, 
+#  to any layer 3 destination:

@@ -1,0 +1,25 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: sparkapp-delete-30days
+spec:
+  schedule: "0 6 * * *"
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 4
+      template:
+        spec:
+          serviceAccountName: spark
+        terminationGracePeriodSeconds: 0
+        restartPolicy: Never
+        containers:
+          - name: kubectl
+            imagePullPolicy: IfNotPresent
+            image: bitnami/kubectl:1.15
+            command:
+            - "/bin/sh"
+            - "-c"
+            - |
+               ns=$(kubectl get sparkapp -A -o go-template --template ''{{range.items}}{{.metadata.name}} {{.metadata.namespace}}  {{.metadata.creationTimestamp}}{{"\n"}}{{end}}'' | awk ''{ print $2 }'' | sort | uniq );for i in $ns; do kubectl get sparkapp -n $i -o go-template --template ''{{range.items}}{{.metadata.name}} {{.metadata.creationTimestamp}}{{"\n"}}{{end}}'' | awk -v date="$(date -d "@$(($(date +%s) - 604800))" +%Y-%m-%d)" ''$2 < date {print $1}'' | xargs --no-run-if-empty kubectl delete sparkapp -n $i;done

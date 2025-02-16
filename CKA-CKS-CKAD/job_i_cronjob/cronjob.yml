@@ -1,0 +1,17 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: hello
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    metadata:
+      name: hello
+    spec:
+      template:
+        spec:
+          containers:
+            - name: hello
+              image: debian:9
+              command: ["echo", "Hello world!"]
+          restartPolicy: Never

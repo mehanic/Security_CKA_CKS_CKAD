@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron-example
+  namespace: ingress-basic
+spec:
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  jobTemplate:
+    spec:
+      parallelism: 1
+      backoffLimit: 3
+      activeDeadlineSeconds: 600
+      template:
+        spec:
+          containers:
+          - image: projectacr23.azurecr.io/python/job:#{buildNo}#
+            imagePullPolicy: Never
+            name: cron-example
+            resources: {}
+          restartPolicy: OnFailure
+  schedule: '*/1 * * * *'

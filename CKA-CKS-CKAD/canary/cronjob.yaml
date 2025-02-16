@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  creationTimestamp: null
+  name: pi
+spec:
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: pi
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - command: ["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]
+            image: busybox
+            name: po
+            resources: {}
+          restartPolicy: Never
+  schedule: '*/10 * * * *'
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 4
+  startingDeadlineSeconds: 22
+status: {}

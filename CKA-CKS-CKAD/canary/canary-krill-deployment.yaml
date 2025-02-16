@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: current-krill-deployment
+  name: canary-krill-deployment
+  namespace: goshawk
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: current-krill-deployment
+      version: v2.0.0
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: current-krill-deployment
+        version: v2.0.0
+    spec:
+      containers:
+      - image: httpd:latest
+        name: apache2
+        ports:
+        - containerPort: 80
+          name: http
+        resources: {}
+        env:
+        - name: VERSION
+          value: "Hello from the environment v2.0.0"
+status: {}

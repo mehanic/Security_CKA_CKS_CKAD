@@ -1,0 +1,91 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "default"
+specs:
+  - endpointSelector:
+      matchLabels:
+        app: httpbin
+    ingress:
+    - fromEndpoints:
+      - matchExpressions:
+          - key: io.kubernetes.pod.namespace
+            operator: In
+            values:
+            - red
+            - blue
+      toPorts:
+      - ports:
+        - port: "80"
+          protocol: TCP
+        rules:
+          http:
+          - method: "GET"
+            path: "/ip"
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netshoot
+  labels:
+    app: netshoot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: netshoot
+  template:
+    metadata:
+      labels:
+        app: netshoot
+    spec:
+      containers:
+      - name: netshoot
+        image: nicolaka/netshoot:v0.9
+        command: ["sleep", "infinite"]
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpbin
+spec:
+  type: ClusterIP
+  selector:
+    app: httpbin
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin
+  labels:
+    app: httpbin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin
+  template:
+    metadata:
+      labels:
+        app: httpbin
+    spec:
+      containers:
+      - name: httpbin
+        image: docker.io/kong/httpbin
+
+---
+
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+spec:
+  mtls:
+    mode: DISABLE

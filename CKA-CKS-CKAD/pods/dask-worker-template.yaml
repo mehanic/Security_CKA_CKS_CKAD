@@ -1,0 +1,18 @@
+kind: Pod
+metadata:
+  labels:
+    role: worker
+spec:
+  restartPolicy: Never
+  containers:
+  - image: daskdev/dask:latest
+    imagePullPolicy: IfNotPresent
+    args: [dask-worker, --nthreads, '1', --no-bokeh, --memory-limit, 2GB, --death-timeout, '60']
+    name: dask
+    env:
+      - name: EXTRA_PIP_PACKAGES
+        value: fastparquet distributed
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2G

@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2024-06-02T07:46:41Z"
+  labels:
+    role: webFrontEnd
+  name: kdsn
+  namespace: kdsn00101
+  resourceVersion: "120389"
+  uid: dca2441b-1678-43dd-8ffa-97453705092f
+spec:
+  clusterIP: 10.100.232.221
+  clusterIPs:
+  - 10.100.232.221
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - nodePort: 31592
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: kdsn00101
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}

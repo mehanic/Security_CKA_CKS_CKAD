@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: octopress
+spec:
+  initContainers:
+    - name: octopress
+      image: registry.gitlab.com/perlstalker/octopress-deploy
+      volumeMounts:
+        - mountPath: /public
+          name: docroot
+  containers:
+    - name: web
+      image: nginx:1.13.6
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: docroot
+  volumes:
+    - name: docroot
+      emptyDir: {}

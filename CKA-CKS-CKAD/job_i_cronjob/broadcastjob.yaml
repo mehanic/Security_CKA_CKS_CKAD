@@ -1,0 +1,54 @@
+apiVersion: apps.kruise.io/v1alpha1
+kind: BroadcastJob
+metadata:
+  name: broadcastjob-active-deadline
+spec:
+  template:
+    spec:
+      containers:
+        - name: sleep
+          image: busybox
+          command: ["sleep", "50000"]
+      restartPolicy: Never
+  completionPolicy:
+    type: Always
+    activeDeadlineSeconds: 10
+
+#This controller distributes a Pod on every node in the cluster. Like a DaemonSet, a BroadcastJob makes sure a Pod is created and run on all selected nodes once in a cluster. Like a Job, a BroadcastJob is expected to run to completion.
+
+      #In the end, BroadcastJob does not consume any resources after each Pod succeeds on every node. This controller is particularly useful when upgrading a software, e.g., Kubelet, or validation check in every node, which is typically needed only once within a long period of time or running an adhoc full cluster inspection script.
+
+#Optionally, a BroadcastJob can keep alive after all Pods on desired nodes complete so that a Pod will be automatically launched for every new node after it is added to the cluster.
+
+#Template
+#Template describes the Pod template used to run the job. Note that for the Pod restart policy, only Never or OnFailure is allowed for BroadcastJob.
+
+      #Parallelism
+      #Parallelism specifies the maximal desired number of Pods that should be run at any given time. By default, there's no limit.
+
+      #For example, if a cluster has ten nodes and Parallelism is set to three, there can only be three pods running in parallel. A new Pod is created only after one running Pod finishes.
+
+      #CompletionPolicy
+      #CompletionPolicy specifies the controller behavior when reconciling the BroadcastJob.
+
+      #Always (default)
+      #Always policy means the job will eventually complete with either failed or succeeded condition. The following parameters take effect with this policy:
+
+      #ActiveDeadlineSeconds specifies the duration in seconds relative to the startTime that the job may be active before the system tries to terminate it. For example, if ActiveDeadlineSeconds is set to 60 seconds, after the BroadcastJob starts running for 60 seconds, all the running pods will be deleted and the job will be marked as Failed.
+
+      #TTLSecondsAfterFinished limits the lifetime of a BroadcastJob that has finished execution (either Complete or Failed). For example, if TTLSecondsAfterFinished is set to 10 seconds, the job will be kept for 10 seconds after it finishes. Then the job along with all the Pods will be deleted.
+
+      #Never
+      #Never policy means the BroadcastJob will never be marked as Failed or Succeeded even if all Pods run to completion. This also means above ActiveDeadlineSeconds, TTLSecondsAfterFinished and FailurePolicy.RestartLimit parameters takes no effect if Never policy is used. For example, if user wants to perform an initial configuration validation for every newly added node in the cluster, he can deploy a BroadcastJob with Never policy.
+
+      #FailurePolicy
+      #Type
+      #Type indicates the type of FailurePolicyType.
+
+      #Continue means the job will be still running, when failed pod is found.
+      #FailFast(default) means the job will be failed, when failed pod is found.
+      #Pause means the job will be paused, when failed pod is found.
+      #RestartLimit
+      #RestartLimit specifies the number of retries before marking the pod failed. Currently, the number of retries are defined as the aggregated number of restart counts across all Pods created by the job, i.e., the sum of the ContainerStatus.RestartCount for all containers in every Pod. If this value exceeds RestartLimit, the job is marked as Failed and all running Pods are deleted. No limit is enforced if RestartLimit is not set.
+
+

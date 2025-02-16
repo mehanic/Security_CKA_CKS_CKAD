@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kdsn00101-deployment
+  namespace: kdsn00101
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: kdsn00101
+  template:
+    metadata:
+      labels:
+        app: kdsn00101
+    spec:
+      containers:
+      - name: your-container-name
+        image: nginx

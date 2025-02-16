@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main-deployment
+  namespace: newcanary
+#  labels:
+#    app: my-app
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: canary-test
+      version: v1
+      environment: main
+  template:
+    metadata:
+      labels:
+        app: canary-test
+        version: v1
+        environment: main
+    spec:
+      containers:
+      - name: first-version
+        image: hashicorp/http-echo
+        args:
+          - "-text=it is MAIN STABLE DEPLOYMENT version"
+        ports:
+        - containerPort: 80
+          name: nginx
+        - containerPort: 5678
+          name: echo-server
+        env:
+        - name: RELEASE
+          value: "prod-release"
+#          volumeMounts:
+#            - name: workdir
+#              mountPath: /usr/share/nginx/html
+#      initContainers:
+#        - name: install
+#          image: busybox:1.28
+#          command:
+#            - /bin/sh
+#            - -c
+#            - "echo version-1 > /work-dir/index.html"
+#          volumeMounts:
+#            - name: workdir
+#              mountPath: "/work-dir"
+#      volumes:
+#        - name: workdir
+#          emptyDir: {}

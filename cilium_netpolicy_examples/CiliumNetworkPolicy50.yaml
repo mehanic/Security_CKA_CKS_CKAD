@@ -1,0 +1,18 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "from-init"
+spec:
+  endpointSelector:
+    matchLabels:
+      app: myService
+  ingress:
+    - fromEntities:
+      - init
+    - toPorts:
+      - ports:
+        - port: "53"
+          protocol: UDP
+
+#writing a rule that allows an endpoint to receive DNS queries from initializing endpoints may be 
+#done as follows:

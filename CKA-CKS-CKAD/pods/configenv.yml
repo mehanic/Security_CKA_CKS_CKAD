@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configenv
+spec:
+  containers:
+    - name: busybox
+      image: busybox:1.27.2
+      stdin: true
+      tty: true
+      env:
+        - name: TEST_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              name: testconf
+              key: test

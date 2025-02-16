@@ -1,0 +1,15 @@
+panic: provided file is not a console
+
+goroutine 1 [running]:
+github.com/containerd/console.Current()
+	/go/src/github.com/containerd/containerd/vendor/github.com/containerd/console/console.go:77 +0x94
+github.com/containerd/containerd/cmd/ctr/commands/run.init.func1(0xc0002fec60)
+	/go/src/github.com/containerd/containerd/cmd/ctr/commands/run/run.go:177 +0x3ca
+github.com/urfave/cli.HandleAction({0x615fbb1b85c0?, 0x615fbb36c328?}, 0x3?)
+	/go/src/github.com/containerd/containerd/vendor/github.com/urfave/cli/app.go:524 +0x50
+github.com/urfave/cli.Command.Run({{0x615fbaf9b354, 0x3}, {0x0, 0x0}, {0x0, 0x0, 0x0}, {0x615fbafa863a, 0xf}, {0x0, ...}, ...}, ...)
+	/go/src/github.com/containerd/containerd/vendor/github.com/urfave/cli/command.go:175 +0x685
+github.com/urfave/cli.(*App).Run(0xc0000f5dc0, {0xc000036240, 0x6, 0x6})
+	/go/src/github.com/containerd/containerd/vendor/github.com/urfave/cli/app.go:277 +0xb3b
+main.main()
+	github.com/containerd/containerd/cmd/ctr/main.go:41 +0x10d

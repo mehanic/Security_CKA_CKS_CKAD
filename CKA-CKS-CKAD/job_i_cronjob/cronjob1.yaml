@@ -1,0 +1,39 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: my-first-conjob
+  namespace: devenv-admitriev
+spec:
+  schedule: "*/10 * * * *" # MM HH DD MM WKD -- Minutes, Hour, Day, Month, Weekday (eg. Sun, Mon)
+  successfulJobsHistoryLimit: 3 # how many completed jobs should be kept
+  failedJobsHistoryLimit: 1 # how many failed jobs should be kept
+  suspend: false # Here you can suspend cronjob without deliting it
+  concurrencyPolicy: Forbid # Choose Forbid if you don't want concurrent executions of your Job
+
+  # The amount of time that Kubernetes can miss and still start a job.
+  # If Kubernetes missed too many job starts (100)
+  # then Kubernetes logs an error and doesn’t start any future jobs.
+  startingDeadlineSeconds: 300 # if a job hasn't started in this many seconds, skip
+  jobTemplate:
+    spec:
+      parallelism: 1 # How many pods will be instantiated at once.
+      completions: 1 # How many containers of the job are instantiated one after the other (sequentially) inside the pod.
+      backoffLimit: 3 # Maximum pod restarts in case of failure
+      activeDeadlineSeconds: 1800 # Limit the time for which a Job can continue to run
+      template:
+        spec:
+          restartPolicy: Never # If you want to restart - use OnFailure
+          terminationGracePeriodSeconds: 30
+          containers:
+          - name: my-first-conjob
+            image: busybox
+            command:
+              - /bin/sh
+            args:
+              - -c
+              - date; echo sleeping....; sleep 90s; echo exiting...;
+            resources:
+              requests:
+                memory: '128Mi'
+              limits:
+                memory: '1Gi'

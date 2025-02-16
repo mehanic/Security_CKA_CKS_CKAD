@@ -1,0 +1,51 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: "tofqdn-dns-visibility"
+spec:
+  endpointSelector:
+    matchLabels:
+      any:org: alliance
+  egress:
+  - toEndpoints:
+    - matchLabels:
+       "k8s:io.kubernetes.pod.namespace": kube-system
+       "k8s:k8s-app": kube-dns
+    toPorts:
+      - ports:
+         - port: "53"
+           protocol: ANY
+        rules:
+          dns:
+            - matchPattern: "*"
+  - toFQDNs:
+      - matchName: "cilium.io"
+      - matchName: "sub.cilium.io"
+      - matchPattern: "*.sub.cilium.io"
+
+
+# A DNS Proxy intercepts egress DNS traffic and records IPs seen in the responses. This interception is,
+#  itself, a separate policy rule governing the DNS requests, and must be specified separately.
+#   For details on how to enforce policy on DNS requests and configuring the DNS proxy, 
+  
+
+# Only IPs in intercepted DNS responses to an application will be allowed in the Cilium policy rules.
+#  For a given domain name, IPs from responses to all pods managed by a Cilium instance are allowed by 
+#  policy (respecting TTLs). This ensures that allowed IPs are consistent with those returned to applications.
+#  A DNS Proxy intercepts egress DNS traffic and records IPs seen in the responses. This interception is,
+#   itself, a separate policy rule governing the DNS requests, and must be specified separately.
+#    For details on how to enforce policy on DNS requests and configuring the DNS proxy,
+
+# Only IPs in intercepted DNS responses to an application will be allowed in the Cilium policy rules. 
+# For a given domain name, IPs from responses to all pods managed by a Cilium instance are allowed by policy
+#  (respecting TTLs). This ensures that allowed IPs are consistent with those returned to applications. 
+#  The DNS Proxy is the only method to allow IPs from responses allowed by wildcard L7 DNS matchPattern rules 
+#  for use in toFQDNs rules.
+
+# The following example obtains DNS data by interception without blocking any DNS requests. 
+# It allows L3 connections to cilium.io, sub.cilium.io and any subdomains of sub.cilium.io.
+#  The DNS Proxy is the only method to allow IPs from responses allowed by wildcard L7 DNS 
+#  matchPattern rules for use in toFQDNs rules.
+
+# The following example obtains DNS data by interception without blocking any DNS requests. 
+# It allows L3 connections to cilium.io, sub.cilium.io and any subdomains of sub.cilium.io.

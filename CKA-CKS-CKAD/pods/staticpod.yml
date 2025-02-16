@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: staticpod
+spec:
+  volumes:
+    - name: staticvol
+      persistentVolumeClaim:
+        claimName: staticpvc
+  containers:
+    - name: busybox
+      image: busybox:1.27.2
+      stdin: true
+      tty: true
+      volumeMounts:
+        - name: staticvol
+          mountPath: /mnt

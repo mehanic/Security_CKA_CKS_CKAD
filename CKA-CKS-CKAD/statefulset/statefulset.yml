@@ -1,0 +1,33 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: stateful
+spec:
+  selector:
+    matchLabels:
+      app: busybox
+  serviceName: busybox
+  replicas: 2
+  volumeClaimTemplates:
+    - metadata:
+        name: statefulvol
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: rbd
+        resources:
+          requests:
+            storage: 10Gi
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      containers:
+        - name: busybox
+          image: busybox:1.27.2
+          stdin: true
+          tty: true
+          volumeMounts:
+            - name: statefulvol
+              mountPath: /mnt

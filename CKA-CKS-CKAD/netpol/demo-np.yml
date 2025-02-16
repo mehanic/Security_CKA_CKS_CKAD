@@ -1,0 +1,21 @@
+  apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    name: demo-np
+    namespace: default
+  spec:
+    podSelector:
+      matchLabels:
+       app: foo
+    policyTypes:
+      - Ingress
+    ingress:
+      - from:
+          - ipBlock:
+              cidr: 192.168.101.0/24
+          - podSelector:
+              matchLabels:
+                app: foo
+        ports:
+          - protocol: TCP
+            port: 80

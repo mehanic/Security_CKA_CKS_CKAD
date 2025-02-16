@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  creationTimestamp: null
+  name: pi
+spec:
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: pi
+    spec:
+      backoffLimit: 5
+      activeDeadlineSeconds: 20 #Setting this parameter to a number will terminate the Job immediately once this number of seconds is reached.
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - image: busybox
+            name: pi
+            command: ["/bin/sh", "-c"]
+            args: ["echo 'Consuming data'; sleep 1; exit 1"]
+            resources: {}
+          restartPolicy: Never
+  schedule: '*/15 * * * *'
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+status: {}

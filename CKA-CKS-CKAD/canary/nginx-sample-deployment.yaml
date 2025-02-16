@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # labels:
+  #  app: main-deployment
+  name: main-deployment
+  namespace: newcanary
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: canary-test
+      environment: main
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: canary-test
+        environment: main
+    spec:
+      containers:
+      - image: hashicorp/http-echo
+        name: http-echo
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}

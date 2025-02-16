@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: test-init-container
+  name: test-init-container
+  namespace: initcontainer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-init-container
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: test-init-container
+    spec:
+      volumes:
+      - name: web-content
+        emptyDir: {}
+      initContainers:
+      - image: busybox:1.31.0
+        name: initcontainer
+        command: ['sh', '-c', 'mkdir /tmp/web-context', 'echo  "check this out!" > /tmp/web-context/index.html']
+        volumeMounts:
+        - name: web-content
+          mountPath: /tmp/web-content
+      containers:
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 80
+        resources: {}
+        volumeMounts:
+        - name: web-content
+          mountPath: /usr/share/nginx/html
+status: {}

@@ -1,0 +1,13 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: network-policy
+  namespace: net-policy 
+spec:
+  podSelector:
+    matchLabels:
+      app: pod2
+  policyTypes:
+    - Ingress
+    - Egress
+#This is one of the simplest possible Network Policies. It selects the pod2 Pod by matching its labels using a podSelector. This is the Pod the Network Policy’s Ingress and Egress rules will apply to. Because the Ingress and Egress policy types are set but no further rules are added, the policy will block all network traffic to and from the Pod

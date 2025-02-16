@@ -1,0 +1,66 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request 
+# events but only for the master branch
+on:
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Runs a set of commands using the runners shell
+    - name: Build and Push
+      env:
+        DOCKER_SECRET: ${{ secrets.DOCKER_SECRET }} 
+      run: |
+        ls -ltr
+        cd ./chapter9
+        echo "Build Docker Image"
+        docker login -u kaizheh -p ${DOCKER_SECRET}
+        docker build -t kaizheh/anchore-cli .
+        docker push kaizheh/anchore-cli
+
+    - name: Scan
+      env:
+        ANCHORE_CLI_URL: ${{ secrets.ANCHORE_CLI_URL }} 
+        ANCHORE_CLI_USER:  ${{ secrets.ANCHORE_CLI_USER }}
+        ANCHORE_CLI_PASS:  ${{ secrets.ANCHORE_CLI_PASS }}
+      run: |      
+        # install anchore-cli
+        # apt-get update && apt-get install -y python-pip jq
+        pip install anchorecli
+        export PATH="$HOME/.local/bin/:$PATH"
+        
+        img="kaizheh/anchore-cli"
+        
+        # add image
+        anchore-cli image add $img
+        
+        # get sha value
+        sha=$(anchore-cli --json --api-version=0.2.4 image get $img | jq .[0].imageDigest -r)
+
+        echo $sha
+
+        # wait for image analyzed
+        anchore-cli image wait $img
+
+        # evaluate policy
+        anchore-cli --json evaluate check $sha --tag $img
+        
+    # Runs a set of commands using the runners shell
+    - name: Post Scan
+      run: |
+        # purpose ends here
+        exit 1

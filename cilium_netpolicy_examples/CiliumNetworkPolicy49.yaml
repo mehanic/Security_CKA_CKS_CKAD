@@ -1,0 +1,22 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "allow-cross-cluster"
+  description: "Allow x-wing in cluster1 to contact rebel-base in cluster2"
+spec:
+  endpointSelector:
+    matchLabels:
+      name: x-wing
+      io.cilium.k8s.policy.cluster: cluster1
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        name: rebel-base
+        io.kubernetes.pod.namespace: default
+        io.cilium.k8s.policy.cluster: cluster2
+
+# When operating multiple cluster with cluster mesh, the cluster name is exposed via the label
+# io.cilium.k8s.policy.cluster and can be used to restrict policies to a particular cluster.
+
+# Note the io.kubernetes.pod.namespace: default in the policy rule. It makes sure the policy 
+# applies to rebel-base in the default namespace of cluster2 regardless of the namespace in cluster1 where x-wing is deployed in. If the namespace label of policy rules is omitted it defaults to the same namespace where the policy itself is applied in, which may be not what is wanted when deploying cross-cluster policies.

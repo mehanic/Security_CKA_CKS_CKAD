@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dynpod
+spec:
+  volumes:
+    - name: dynvol
+      persistentVolumeClaim:
+        claimName: dynpvc
+  containers:
+    - name: busybox
+      image: busybox:1.27.2
+      stdin: true
+      tty: true
+      volumeMounts:
+        - name: dynvol
+          mountPath: /mnt

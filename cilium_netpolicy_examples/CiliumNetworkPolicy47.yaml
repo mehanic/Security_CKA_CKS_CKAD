@@ -1,0 +1,47 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "or-statement-policy"
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - matchExpressions:
+      - key: "k8s:io.kubernetes.pod.namespace"
+        operator: "in"
+        values:
+        - "production"
+    - matchExpressions:
+      - key: "k8s:cilium.example.com/policy"
+        operator: "in"
+        values:
+        - "strict"
+
+# This example demonstrates how to enforce a policy with multiple matchExpressions that achieves 
+# a logical OR between the keys and its values.
+
+
+
+
+
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "and-statement-policy"
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - matchExpressions:
+      - key: "k8s:io.kubernetes.pod.namespace"
+        operator: "in"
+        values:
+        - "production"
+      - key: "k8s:cilium.example.com/policy"
+        operator: "in"
+        values:
+        - "strict"
+
+
+#The following example shows a logical AND using a single matchExpression.
+

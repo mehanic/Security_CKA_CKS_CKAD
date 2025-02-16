@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: canary-test-svc
+  namespace: newcanary
+#  labels:
+#    app: my-app
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+    - port: 5678
+      name: http-web
+      targetPort: 5678
+  selector:
+    app: canary-test

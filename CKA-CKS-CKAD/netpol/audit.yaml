@@ -1,0 +1,98 @@
+apiVersion: audit.k8s.io/v1 # This is required.
+kind: Policy
+# Don't generate audit events for all requests in RequestReceived stage.
+omitStages:
+  - "RequestReceived"
+rules:
+  # Don't log requests to a configmap called "controller-leader"
+  - level: None
+    resources:
+    - group: ""
+      resources: ["configmaps"]
+      resourceNames: ["controller-leader"]
+
+  # Don't log watch requests by the "system:kube-proxy" on endpoints or services
+  - level: None
+    users: ["system:kube-proxy"]
+    verbs: ["watch"]
+    resources:
+    - group: "" # core API group
+      resources: ["endpoints", "services"]
+
+  # Don't log authenticated requests to certain non-resource URL paths.
+  - level: None
+    userGroups: ["system:authenticated"]
+    nonResourceURLs:
+    - "/api*" # Wildcard matching.
+    - "/version"
+
+  # Log the request body of configmap changes in kube-system.
+  - level: Request
+    resources:
+    - group: "" # core API group
+      resources: ["cronjobs"]
+    # This rule only applies to resources in the "kube-system" namespace.
+    # The empty string "" can be used to select non-namespaced resources.
+  - level: Request
+    resources:
+    - group: ""
+      # Resource "pods" doesn't match requests to any subresource of pods,
+      # which is consistent with the RBAC policy.
+      resources: ["pods"]
+      namespaces: ["webapps"]
+  
+  # Log configmap and secret changes in all other namespaces at the Metadata level.
+  - level: Metadata
+    resources:
+    - group: "" # core API group
+      resources: ["secrets", "configmaps"]
+
+  # A catch-all rule to log all other requests at the Metadata level.
+  - level: Metadata
+    # Long-running requests like watches that fall under this rule will not
+    # generate an audit event in RequestReceived.
+    omitStages:
+      - "RequestReceived"
+
+
+
+слухаю розмову і усвідомлюю що у всіх зараз моральний стрес за життя серед прихильників влади. Всі згадують що фаріон сіяла ненависть через мову,  а сіяти ненависть через корупцію та торгівлю дітьми, продажництвом та зрадництвом то це не ненависть? (це типу стандарт нашого існування і  ми мусимо іти шляхом поступової очистки яка триватиме десятки років) 
+ Фаріон не боялася смерті - вона як і попередники: Коновалець,  Лев Ребет, Чорновіл , були готові до кінця. А ось зараз це відкриває двері для дій в країні де колосальна кількість зброї, а оскільки в подіях в 2014 року чи і інші є багато одіозних фігур що багато чого спричинили - особливо наприклад закон Ківалова Колісніченка, і так далі , особливо після закону про корупцію що можна відкупитися - ця подія показала домінування поглядів різкими рішеннями як в Колумбії. В нас же багато бувших депутатів, мерів і так далі які причетні до антигуманних подій і до яких не дійшла рука правосуддя, а представте собі що появляться такі групи на кшталт мексиканських "Лос Сетас" числом в 500 чи 1000 чловік підлаштованих не мовою а почуттям справедивості і тоді не одна людина чатувати у підїзді а чоловік десять з кулеметами.
+уже цитують класиків і згадуюте що оцінку може ставити суд - Який Суд? той що закрив убивство десятирічного розслідування "небесної сотні"  за відсутність доказів - тобто ті хто стріляли в простих людей вони в шоколаді і заробили, у вас же було 34 роки щоб створити правову державу а ви гралися і закривали очі , доречі ніхто не згадує про рекет і кришування органами потоків , А ось тепер появився новий сильний фактор - пістолет адже справедливості не було 34 роки. І це уже не  ненависть це уже розплата
+ І це все накриватиме всі Кончі заспи, суддівську мафію, митну мафію. Доречі  Почув фразу що ми повинні любити один одного з уст дівчини, пропоную обійняти і поцілувати в уста депутата якого спіймали на взятці за 3 мільйони а потім було внесено закон і прийнято в першому читанні що можна викупитися за злочин. Поцілуватися палко - по брежнівськи і піти на каву
+
+
+https://killercoda.com/killer-shell-cks/scenario/networkpolicy-create-default-deny
+https://killercoda.com/killer-shell-cks/scenario/networkpolicy-namespace-communication
+
+https://killercoda.com/killer-shell-cks/scenario/cis-benchmarks-kube-bench-fix-controlplane
+
+https://killercoda.com/killer-shell-cks/scenario/rbac-serviceaccount-permissions
+https://killercoda.com/killer-shell-cks/scenario/rbac-user-permissions
+
+https://killercoda.com/killer-shell-cks/scenario/serviceaccount-token-mounting
+
+https://killercoda.com/killer-shell-cks/scenario/apiserver-node-restriction
+
+https://killercoda.com/killer-shell-cks/scenario/secret-pod-access
+https://killercoda.com/killer-shell-cks/scenario/secret-read-secrets
+https://killercoda.com/killer-shell-cks/scenario/secret-serviceaccount-pod
+
+https://killercoda.com/killer-shell-cks/scenario/sandbox-gvisor
+
+https://killercoda.com/killer-shell-cks/scenario/privileged-containers
+https://killercoda.com/killer-shell-cks/scenario/privilege-escalation-containers
+
+https://killercoda.com/killer-shell-cks/scenario/image-policy-webhook-setup
+https://killercoda.com/killer-shell-cks/scenario/image-vulnerability-scanning-trivy
+
+https://killercoda.com/killer-shell-cks/scenario/static-manual-analysis-k8s
+https://killercoda.com/killer-shell-cks/scenario/static-manual-analysis-docker
+
+https://killercoda.com/killer-shell-cks/scenario/falco-change-rule
+
+https://killercoda.com/killer-shell-cks/scenario/immutability-readonly-fs
+
+https://killercoda.com/killer-shell-cks/scenario/auditing-enable-audit-logs
+
+https://killercoda.com/killer-shell-cks/scenario/apparmor

@@ -1,0 +1,36 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: database-policy
+  namespace: default
+spec:
+  endpointSelector:
+    matchLabels:
+      tier: database
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            tier: backend
+      toPorts:
+        - ports:
+            - port: "7379"
+    - fromCIDRSet:
+        - cidr: 102.213.50.174/32
+      toPorts:
+        - ports:
+            - port: "443"
+  egress:
+    - {}
+
+
+# We have a team of developers and administrators who need to access the cluster 
+# from outside the office, and we’re routing their incoming traffic through a VPN with the 
+# IP address 172.27.224.3, as an administrator, 
+# I want to ensure all developers and administrators using this VPN can access the database pods.
+
+# Since all the incoming external traffic to our database pod is routed through a VPN,
+#  this user story entails that the only external IP address that can access our database 
+#  pods is the IP address of the VPN server. Cilium Network Policy provides CIDR-based policies 
+#  for controlling traffic to known IP addresses and CIDRs. The fromCIDR and fromCIDRSet fields 
+#  in the spec define ingress traffic rules, and toCIDR and toCIDRSet define egress traffic rules. 
+#  The toCIDRSet field allows us to define exclusion rules for subnets within a CIDR.

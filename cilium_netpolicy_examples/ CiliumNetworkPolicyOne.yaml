@@ -1,0 +1,22 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: database-policy
+  namespace: default
+spec:
+  endpointSelector:
+    matchLabels:
+      tier: database
+  ingress:
+    - {}
+    - fromEndpoints:
+        - matchLabels:
+            tier: backend
+      toPorts:
+        - ports:
+            - port: "7379"
+  egress:
+    - {}
+
+#We now add an ingress rule that allows traffic for the backend pods
+# while leaving the egress rule in its default deny state. 

@@ -1,0 +1,16 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: web-network-policy
+  namespace: ckad0024
+spec:
+  podSelector:
+     matchLabels:
+        role: web
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+      - podSelector:
+           matchLabels:
+              role: client

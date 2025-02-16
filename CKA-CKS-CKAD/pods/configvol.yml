@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configvol
+spec:
+  volumes:
+    - name: testconf-volume
+      configMap:
+        name: testconf
+  containers:
+    - name: busybox
+      image: busybox:1.27.2
+      stdin: true
+      tty: true
+      volumeMounts:
+        - name: testconf-volume
+          mountPath: /etc/testconf

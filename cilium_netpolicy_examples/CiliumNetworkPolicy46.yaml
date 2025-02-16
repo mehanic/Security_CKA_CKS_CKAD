@@ -1,0 +1,20 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "allow-to-kubedns"
+  namespace: public
+spec:
+  endpointSelector:
+    {}
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+
+# The following example allows all pods in the public namespace in which the policy is created
+#  to communicate with kube-dns on port 53/UDP in the kube-system namespace.

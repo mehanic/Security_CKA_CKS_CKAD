@@ -1,0 +1,20 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "k8s-expose-across-namespace"
+  namespace: ns1
+spec:
+  endpointSelector:
+    matchLabels:
+      name: leia
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: ns2
+        name: luke
+
+# The following example exposes all pods with the label name=leia in the namespace ns1 to all pods 
+# with the label name=luke in the namespace ns2.
+
+# Refer to the example YAML files for a fully functional example including pods deployed to different 
+# namespaces.

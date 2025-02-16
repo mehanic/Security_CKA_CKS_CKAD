@@ -1,0 +1,43 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: grafana
+spec:
+  replicas: 1
+  strategy:
+    type: "Recreate"
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      volumes:
+        - name: grafana-data
+          emptyDir: {}
+      containers:
+        - name: grafana
+          image: grafana/grafana:4.6.3
+          ports:
+            - containerPort: 3000
+          env:
+            - name: GF_INSTALL_PLUGINS
+              value: "grafana-clock-panel"
+          volumeMounts:
+            - name: grafana-data
+              mountPath: /var/lib/grafana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+spec:
+  selector:
+    app: grafana
+  type: LoadBalancer
+  ports:
+    - name: grafana
+      protocol: "TCP"
+      port: 3000

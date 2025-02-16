@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: volumepod
+spec:
+  volumes:
+    - name: rbdtest
+      rbd:
+        monitors:
+          - 'ceph1:6789'
+        pool: rbd
+        image: rbdtest
+        fsType: ext4
+        readOnly: false
+        user: admin
+        secretRef:
+          name: ceph-secret
+  containers:
+    - name: busybox
+      image: busybox:1.27.2
+      stdin: true
+      tty: true
+      volumeMounts:
+        - name: rbdtest
+          mountPath: /mnt/rbdtest

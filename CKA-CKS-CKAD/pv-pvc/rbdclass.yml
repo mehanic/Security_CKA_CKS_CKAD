@@ -1,0 +1,14 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rbd
+provisioner: ceph.com/rbd
+parameters:
+  monitors: ceph1:6789
+  adminId: admin
+  adminSecretName: ceph-secret
+  pool: rbd
+  userId: admin
+  userSecretName: ceph-secret
+  imageFormat: "2"
+  imageFeatures: "layering"

@@ -1,0 +1,16 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "allow-all-from-frontend"
+spec:
+  endpointSelector:
+    matchLabels:
+      role: frontend
+  egress:
+  - toEndpoints:
+    - {}
+
+# An empty Endpoint Selector will select all egress endpoints from an endpoint
+#  based on the CiliumNetworkPolicy namespace (default by default). The following
+#   rule allows all egress traffic from endpoints with the label role=frontend 
+#   to all other endpoints in the same namespace:

@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name:  multicontainer-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: busy
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command:
+          - sh
+          - -c
+        args:
+          - echo start > /cache/start; sleep 30; echo stop >  /cache/stop; 
+        volumeMounts:
+        - mountPath: /cache
+          name: cache-volume
+      - name: nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /cache
+          name: cache-volume
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - if test -f "/cache/stop"; then exit 1; fi;
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      restartPolicy: Never
+      volumes:
+      - name: cache-volume
+        emptyDir:
+          sizeLimit: 500Mi
+  backoffLimit: 4
+                  

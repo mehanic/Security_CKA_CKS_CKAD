@@ -1,0 +1,46 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: prometheus
+spec:
+  replicas: 1
+  strategy:
+    type: "Recreate"
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      serviceAccountName: prometheus
+      volumes:
+        - name: prom-config
+          configMap:
+            name: prometheus
+        - name: prom-data
+          emptyDir: {}
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.0.0
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: prom-config
+              mountPath: /etc/prometheus
+            - name: prom-data
+              mountPath: /prometheus-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+spec:
+  selector:
+    app: prometheus
+  type: LoadBalancer
+  ports:
+    - name: prometheus
+      protocol: "TCP"
+      port: 9090

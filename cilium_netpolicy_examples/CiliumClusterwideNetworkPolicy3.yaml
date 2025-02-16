@@ -1,0 +1,22 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: "clusterwide-policy-example"
+spec:
+  description: "Policy for selective ingress allow to a pod from only a pod with given label"
+  endpointSelector:
+    matchLabels:
+      name: leia
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        name: luke
+
+
+# CiliumNetworkPolicy only allows to bind a policy restricted to a particular namespace.
+#  There can be situations where one wants to have a cluster-scoped effect of the policy,
+#   which can be done using Cilium’s CiliumClusterwideNetworkPolicy Kubernetes custom resource.
+#    The specification of the policy is same as that of CiliumNetworkPolicy except that it is not namespaced.
+
+# In the cluster, this policy will allow ingress traffic from pods matching the label name=luke
+#  from any namespace to pods matching the labels name=leia in any namespace.

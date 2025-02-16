@@ -1,0 +1,126 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    cni.projectcalico.org/containerID: 6e6820f640749572be3de2ea0252c395b9bbeecafff2bb892c43d0441ec76437
+    cni.projectcalico.org/podIP: ""
+    cni.projectcalico.org/podIPs: ""
+  creationTimestamp: "2024-06-04T14:09:07Z"
+  labels:
+    app: secure-app
+  name: www
+  namespace: ckad0022
+  resourceVersion: "5925165"
+  uid: 1bf7deaf-8e38-44e3-9873-24e9532b8b59
+spec:
+  containers:
+  - image: nginx
+    imagePullPolicy: Always
+    name: www
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-x2j2k
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: skynet
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-x2j2k
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2024-07-04T03:07:40Z"
+    message: 'The node was low on resource: ephemeral-storage. Threshold quantity:
+      75271448290, available: 73383844Ki. Container www was using 108Ki, request is
+      0, has larger consumption of ephemeral-storage. '
+    reason: TerminationByKubelet
+    status: "True"
+    type: DisruptionTarget
+  - lastProbeTime: null
+    lastTransitionTime: "2024-07-04T03:07:40Z"
+    status: "False"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2024-06-04T14:09:07Z"
+    reason: PodCompleted
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2024-07-04T03:07:40Z"
+    reason: PodCompleted
+    status: "False"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2024-07-04T03:07:40Z"
+    reason: PodCompleted
+    status: "False"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2024-06-04T14:09:07Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://7a17e54b9e493e7a6b89d73fd26080041aaeebe05f60ebdbf76d576a48504f45
+    image: docker.io/library/nginx:latest
+    imageID: docker.io/library/nginx@sha256:9c367186df9a6b18c6735357b8eb7f407347e84aea09beb184961cb83543d46e
+    lastState:
+      terminated:
+        containerID: containerd://1f8ccc5cd0ab8eb53748f730a0fd47b896b1c19efcfd8fcec5db297753d5e06f
+        exitCode: 255
+        finishedAt: "2024-07-01T00:53:28Z"
+        reason: Unknown
+        startedAt: "2024-07-01T00:49:40Z"
+    name: www
+    ready: false
+    restartCount: 32
+    started: false
+    state:
+      terminated:
+        containerID: containerd://7a17e54b9e493e7a6b89d73fd26080041aaeebe05f60ebdbf76d576a48504f45
+        exitCode: 0
+        finishedAt: "2024-07-04T03:07:40Z"
+        reason: Completed
+        startedAt: "2024-07-01T00:53:57Z"
+  hostIP: 192.168.2.221
+  hostIPs:
+  - ip: 192.168.2.221
+  phase: Succeeded
+  qosClass: BestEffort
+  startTime: "2024-06-04T14:09:07Z"

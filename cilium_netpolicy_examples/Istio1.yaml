@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: httpbin
+  namespace: foo
+spec:
+  action: DENY
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/default/sa/my-service-account
+  - to:
+    - operation:
+        methods: ["POST"]
+        ports: ["8080"]

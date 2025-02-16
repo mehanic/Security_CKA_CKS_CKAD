@@ -1,0 +1,38 @@
+
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: hello-apps
+  labels:
+    team: "hello"
+
+---
+
+
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  # Name the network policy
+  name: hello-server-allow-from-hello-client
+spec:
+
+  # Define this as an ingress rule which allows us to restrict access to a set of pods.
+  policyTypes:
+  - Ingress
+
+  # Defines the set of pods to which this policy applies
+  # In this case, we apply the policy to pods labeled as app=hello-server
+  podSelector:
+    matchLabels:
+      app: hello-server
+
+  # Define the sources allowed by this policy
+  # In this case, we allow ingress from all pods the namespace labeled as team=hello
+  # Note: as of Kubernetes 1.10. It is not possible to restrict connections
+  # by both namespace and pod labels simultaneously. However support is
+  # expected to be added in the future.
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          team: hello

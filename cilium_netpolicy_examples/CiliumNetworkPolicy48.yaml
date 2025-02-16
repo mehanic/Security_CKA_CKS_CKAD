@@ -1,0 +1,23 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "k8s-svc-account"
+spec:
+  endpointSelector:
+    matchLabels:
+      io.cilium.k8s.policy.serviceaccount: leia
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        io.cilium.k8s.policy.serviceaccount: luke
+    toPorts:
+    - ports:
+      - port: '80'
+        protocol: TCP
+      rules:
+        http:
+        - method: GET
+          path: "/public$"
+
+#The following example grants any pod running under the service account of “luke” to issue a HTTP GET /public request on TCP port 80 to all pods running associated to the service account of “leia”.
+

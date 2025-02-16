@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  creationTimestamp: null
+  name: mycronjob
+spec:
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: mycronjob
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+            containers:
+            - name: mycron-container
+              image: alpine
+              imagePullPolicy: IfNotPresent        
+              command: ['sh', '-c', 'echo Job Pod is Running ; sleep 80']
+              resources: {}
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: 0
+  schedule: '*/5 * * * *'
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 10
+status: {}
+
+#If this field is not specified, the jobs have no deadline.
+
+  #Summary: if a job misses its scheduled time by startingDeadlineSeconds it gets skipped.
+
+  #The next scheduled time it will attempt to run again.
+
+  #Below we have a cron job that should run every minute.
+
+  #The work of this cron job is to sleep for 80 seconds.
+
+  #We have concurrencyPolicy: Forbid specified. Two or more jobs may not run simultaneously.
+
+  #startingDeadlineSeconds: 10 means it must start within 10 seconds each minute.
+
+  #The Pod sleeps for 80 seconds means it will still be running a minute later. One minute later the next job cannot start ( concurrencyPolicy: Forbid ) because previous job still has 20 seconds of running time left. This second job will be skipped. This is what we attempt to observe below.
+
+

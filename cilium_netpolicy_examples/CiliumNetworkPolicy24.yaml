@@ -1,0 +1,15 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "dev-to-host"
+spec:
+  endpointSelector:
+    matchLabels:
+      env: dev
+  egress:
+    - toEntities:
+      - host
+
+
+#Access to/from local host
+#Allow all endpoints with the label env=dev to access the host that is serving the particular endpoint.

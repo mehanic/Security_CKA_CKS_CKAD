@@ -1,0 +1,19 @@
+#job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello-world
+  namespace: cronjob
+spec:
+  activeDeadlineSeconds: 15
+  template:
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+        command: ["sleep",  "45"]
+      restartPolicy: Never
+
+#ActiveDeadlineSeconds specifies the maximum amount of time a job can run before it is terminated. This can be useful for workloads with strict time constraints or prevent a job from running indefinitely.
+
+#In the code above, the activeDeadlineSeconds field is set to 15, which specifies that the job should be automatically terminated if it has been running for more than 15 seconds.

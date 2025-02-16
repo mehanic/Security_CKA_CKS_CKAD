@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: all-access
+  namespace: cronjob
+spec:
+  podSelector:
+    matchLabels:
+      all-access: "true"
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - {}  # Allows all ingress traffic
+  egress:
+  - {}  # Allows all egress traffic
+

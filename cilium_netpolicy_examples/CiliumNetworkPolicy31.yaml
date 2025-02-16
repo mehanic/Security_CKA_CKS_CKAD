@@ -1,0 +1,29 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "to-fqdn"
+spec:
+  endpointSelector:
+    matchLabels:
+      app: test-app
+  egress:
+    - toEndpoints:
+      - matchLabels:
+          "k8s:io.kubernetes.pod.namespace": kube-system
+          "k8s:k8s-app": kube-dns
+      toPorts:
+        - ports:
+           - port: "53"
+             protocol: ANY
+          rules:
+            dns:
+              - matchPattern: "*"
+    - toFQDNs:
+        - matchName: "my-remote-service.com"
+
+
+# The example below allows all DNS traffic on port 53 to the DNS service 
+# and intercepts it via the DNS Proxy. If using a non-standard DNS port for a DNS 
+# application behind a Kubernetes service, the port must match the backend port. When 
+# the application makes a request for my-remote-service.com, Cilium learns the IP address 
+# and will allow traffic due to the match on the name under the toFQDNs.matchName rule.

@@ -1,0 +1,40 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: backend-policy
+spec:
+  endpointSelector: 
+    matchLabels:
+       tier: backend
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            tier: frontend
+      toPorts:
+        - ports:
+            - port: "80"
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            tier: database
+      toPorts:
+        - ports:
+            - port: "7379"
+    - toFQDNs:
+        - matchPattern: "*.cloud.google.com"
+      toPorts:
+        - ports:
+            - port: "443"
+        - ports:
+            - port: "80"
+    - toEndpoints:
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"

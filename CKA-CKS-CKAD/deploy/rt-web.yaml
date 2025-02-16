@@ -1,0 +1,65 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: rt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rt
+  template:
+    metadata:
+      labels:
+        app: rt
+    spec:
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: rtnginx
+      containers:
+        - name: rt
+          image: perlstalker/rtdemo:latest
+          command: [ "fcgi" ]
+          ports:
+            - containerPort: 9000
+          env:
+            - name: RT_DOMAIN
+              value: rt.local
+            - name: RT_DB_HOST
+              value: rtmysql
+            - name: RT_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rt
+                  key: rt_user
+            - name: RT_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rt
+                  key: rt_password
+            - name: RT_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: rt
+                  key: database
+        - name: nginx
+          image: nginx:1.13.8
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rt
+spec:
+  type: LoadBalancer
+  selector:
+    app: rt
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80

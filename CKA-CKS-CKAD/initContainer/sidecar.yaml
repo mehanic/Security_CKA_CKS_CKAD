@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: sidecar-container
+  name: sidecar-container
+  namespace: initcontainer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cidecar-container
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: sidecar-container
+    spec:
+      volumes:
+      - name: web-content
+        emptyDir: {}
+      initContainers:
+      - image: bash:5.0.11
+        name: initcontainer
+        command: ['sh', '-c', 'echo init > /var/log/cleaner/cleaner.log']
+        volumeMounts:
+        - name: logs
+          mountPath: /var/log/cleaner
+      containers:
+      - image: nginx
+        name: nginx
+        args: ['sh', '-c', 'while true; do echo `date`: "remove random file" >> /var/log/cleaner.log; sleep 1; done']
+        ports:
+        - containerPort: 80
+        resources: {}
+        volumeMounts:
+        - name: logs
+          mountPath: /var/log/cleaner
+      - image: busybox:1.31.0
+        name: sidecar
+        command: ['sh', '-c', 'tail -f /var/log/cleaner/cleaner.log']
+        volumeMounts:
+        - name: logs
+          mountPath: /var/log/cleaner
+status: {}

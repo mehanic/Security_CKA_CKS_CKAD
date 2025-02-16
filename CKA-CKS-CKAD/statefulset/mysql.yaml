@@ -1,0 +1,68 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: rtmysql
+spec:
+  selector:
+    matchLabels:
+      app: rtmysql
+  serviceName: rtmysql
+  replicas: 1
+  volumeClaimTemplates:
+    - metadata:
+        name: mysqldata-vol
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: rbd
+        resources:
+          requests:
+            storage: 10Gi
+  template:
+    metadata:
+      labels:
+        app: rtmysql
+    spec:
+      containers:
+        - name: mysql
+          image: mariadb:10.2
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rt
+                  key: root_password
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rt
+                  key: rt_user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rt
+                  key: rt_password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: rt
+                  key: database
+          volumeMounts:
+            - name: mysqldata-vol
+              mountPath: /var/lib/mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rtmysql
+spec:
+  type: ClusterIP
+  selector:
+    app: rtmysql
+  ports:
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: 3306

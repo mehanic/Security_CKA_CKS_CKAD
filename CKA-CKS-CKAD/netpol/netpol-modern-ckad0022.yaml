@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ckad0022-newpod
+  namespace: ckad0022
+spec:
+  podSelector:
+    matchLabels:
+      allow-access: "true"
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: secure-app
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: secure-app
+
+

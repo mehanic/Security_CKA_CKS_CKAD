@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  creationTimestamp: null
+  name: pi
+spec:
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: pi
+    spec:
+      completions: 1
+      backoffLimit: 25
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - image: perl:5.34.0
+            name: pi
+            command: ["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]
+            resources: {}
+          restartPolicy: Never
+  schedule: '*/1 * * * *'
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+status: {}
+
+#When we don’t need a long running resource like Deployment & ReplicaSet, the option is Job or CronJob in Kubernetes environment. By the name it’s clear CronJob takes a cron type of syntax mentioning when the job is to run. The K8s system itself triggers the job at the specified time in cron. Like, * * * * * runs the job every minute. 5 4 * * * runs the job at 4:05 AM every day. No external trigger is necessary after applying the resource.
+#
+#But Job needs to be triggered manually or through any CI/CD system. In this post, I will be sharing the examples where using Job or CronJob made more sense to me in different projects. Either could be used as an alternate to in some cases.
+
+  #SSL certificate renewal is mostly done at certain interval and we don’t want to miss the renewals and depend on other external triggers as K8s native is more reliable. Also, this doesn’t change often neither we need to run it manually as automated job will take care of the rest.
+
+  #If we are doing some development work, cronjob alone might not make sense because we need to do lots of test works during the process. So, CronJob along with Job setup for manual run will help fasten to get the stability.
+
+  #Parallel Job Execution
+  #Job type is more defined in case we need to run parallel jobs. A default job has .spec.completions and .spec.parallelismunset or defaults to 1. But if we need to run parallel jobs or even want a number of completions of tasks, this can be achieved only with Job type. Read more about parallel and completions from this doc.
+
+  #CronJob can be unreliable
+  #There is chance of non-execution and missing schedule if the startingDeadlineSeconds is set to lower than 10 sec and if more than 100 schedules are missed respectively.
+
+  #If startingDeadlineSeconds is set to a large value or left unset (the default) and if concurrencyPolicy is set to Allow, the jobs will always run at least once.
+
+  #Caution: If startingDeadlineSeconds is set to a value less than 10 seconds, the CronJob may not be scheduled. This is because the CronJob controller checks things every 10 seconds.
+  #For every CronJob, the CronJob Controller checks how many schedules it missed in the duration from its last scheduled time until now. If there are more than 100 missed schedules, then it does not start the job and logs the error
+
+  #But Job need not to handle such cases making it more reliable.
+
+  #The core configs like RestartPolicy, Resource usage, ConfigMap, Secrets can be used on both Job and CronJob.

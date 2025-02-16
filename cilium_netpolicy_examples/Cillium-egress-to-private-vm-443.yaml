@@ -1,0 +1,12 @@
+metadata:
+  name: egress-to-private-vm-443
+spec:
+  endpointSelector:
+    matchLabels:
+      app: foo
+  egress:
+    - toCIDRSet:
+        - cidr: 192.168.1.22/32
+    - toPorts:
+        - ports:
+            - port: 443

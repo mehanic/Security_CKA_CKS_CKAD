@@ -1,0 +1,30 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: access-nginx
+spec:
+  podSelector:
+    matchLabels:
+      run: nginx
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          access: "true"
+
+
+
+            #1.On the Deployments tab, click Create from Image. On the Create page, create an application named nginx and expose the application by using a Service. After you complete the application configuration, click Create.
+            #2.kubectl run busybox --rm -ti --image=busybox /bin/sh,  wget nginx
+
+            #Connecting to nginx (172.19.XX.XX:80)
+            #wget: can't connect to remote host (172.19.XX.XX): Connection timed out
+
+            #3.kubectl run busybox --rm -ti --labels="access=true" --image=busybox /bin/sh
+            #wget nginx
+            #Connecting to nginx (172.21.XX.XX:80)
+            #saving to 'index.html'
+            #index.html           100% |****************************************************************************************************************************************************|   612  0:00:00 ETA
+'
+
+

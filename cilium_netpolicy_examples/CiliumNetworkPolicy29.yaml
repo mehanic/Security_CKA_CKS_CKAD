@@ -1,0 +1,16 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "to-prod-from-control-plane-nodes"
+spec:
+  endpointSelector:
+    matchLabels:
+      env: prod
+  ingress:
+    - fromNodes:
+        - matchLabels:
+            node-role.kubernetes.io/control-plane: ""
+
+#This example shows how to allow all endpoints with the label env=prod
+# to receive traffic only from control plane (labeled node-role.kubernetes.io/control-plane="") 
+#nodes in the cluster (or clustermesh).

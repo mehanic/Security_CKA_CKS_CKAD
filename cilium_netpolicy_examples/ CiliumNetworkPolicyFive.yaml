@@ -1,0 +1,58 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: backend-policy
+spec:
+  endpointSelector: 
+    matchLabels:
+       tier: backend
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            tier: frontend
+      toPorts:
+        - ports:
+            - port: "80"
+    - fromCIDRSet:
+      - cidr: 172.224.3/32
+      toPorts:
+        - ports:
+          - port: "80"
+            protocol: TCP
+          rules:
+            http:
+            - method: "GET"
+              path: "/docs" 
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            tier: database
+      toPorts:
+        - ports:
+            - port: "7379"
+    - toFQDNs:
+        - matchPattern: "*.cloud.google.com"
+      toPorts:
+        - ports:
+            - port: "443"
+        - ports:
+            - port: "80"
+    - toEndpoints:
+      - matchLabels:
+          io.kubernetes.pod.namespace: kube-system
+          k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"
+
+
+#In addition to the CIDR-based policies we’ve seen in the previous user story, 
+#this user story introduces Layer 7 policies to satisfy the HTTP route requirement. 
+#On Layer 3, we need a CIDR rule to allow ingress traffic from 172.224.3/32 (i.e the IP 
+#address of the VPN server), and on the Layer 7 side, we need a rule that allows access to 
+#the HTTP route /docs only. 
+

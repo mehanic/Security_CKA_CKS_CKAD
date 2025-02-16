@@ -1,0 +1,25 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "l7-rule"
+spec:
+  endpointSelector:
+    matchLabels:
+      app: myService
+  ingress:
+  - toPorts:
+    - ports:
+      - port: '80'
+        protocol: TCP
+      rules:
+        http:
+        - method: GET
+          path: "/path1$"
+        - method: PUT
+          path: "/path2$"
+          headers:
+          - 'X-My-Header: true'
+
+#The following example limits all endpoints which carry the labels app=myService to only 
+#be able to receive packets on port 80 using TCP. While communicating on this port, the only 
+#API endpoints allowed will be GET /path1, and PUT /path2 with the HTTP header X-My-Header set to true:
