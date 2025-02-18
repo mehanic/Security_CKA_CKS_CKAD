@@ -72,9 +72,4 @@ func main() {
 
 // ebpf_bpfel.o (for little-endian machines)
 // ebpf_bpfeb.o (for big-endian machines)
-// Since you're likely on a little-endian machine (like x86_64 or ARM64), you should use:
-
-// bash
-// Copy
-// Edit
-// ebpf_bpfel.o
+// Since you're likely on a little-endian machine (like x86_64 or ARM64), you should use: ebpf_bpfel.o
