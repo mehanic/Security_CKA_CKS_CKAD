@@ -1,0 +1,543 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: basic-ingress
+  namespace: default
+spec:
+  ingressClassName: cilium
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: details
+            port:
+              number: 9080
+        path: /details
+        pathType: Prefix
+      - backend:
+          service:
+            name: productpage
+            port:
+              number: 9080
+        path: /
+        pathType: Prefix
+---
+
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: self-signed
+  namespace: default
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ca
+  namespace: default
+spec:
+  isCA: true
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  secretName: ca
+  commonName: ca
+  issuerRef:
+    name: self-signed
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: ca-issuer
+  namespace: default
+spec:
+  ca:
+    secretName: ca
+---
+
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mutual-auth-echo
+spec:
+  endpointSelector:
+    matchLabels:
+      app: echo
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        app: pod-worker
+    authentication:
+      mode: "required"
+    toPorts:
+    - ports:
+      - port: "3000"
+        protocol: TCP
+      rules:
+        http:
+        - method: "GET"
+          path: "/headers"
+
+---
+
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: no-mutual-auth-echo
+spec:
+  endpointSelector:
+    matchLabels:
+      app: echo
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        app: pod-worker
+    toPorts:
+    - ports:
+      - port: "3000"
+        protocol: TCP
+      rules:
+        http:
+        - method: "GET"
+          path: "/headers"
+
+---
+
+# GRPC ingress for GCP microservice demo application
+# https://github.com/GoogleCloudPlatform/microservices-demo
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grpc-ingress
+  namespace: default
+spec:
+  ingressClassName: cilium
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: productcatalogservice
+            port:
+              number: 3550
+        path: /hipstershop.ProductCatalogService
+        pathType: Prefix
+      - backend:
+          service:
+            name: currencyservice
+            port:
+              number: 7000
+        path: /hipstershop.CurrencyService
+        pathType: Prefix
+
+---
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: multiple-path-types
+  namespace: default
+spec:
+  ingressClassName: cilium
+  rules:
+  - host: "pathtypes.example.com"
+    http:
+      paths:
+      - backend:
+          service:
+            name: exactpath
+            port:
+              number: 80
+        path: /exact
+        pathType: Exact
+      - backend:
+          service:
+            name: prefixpath
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+      - backend:
+          service:
+            name: prefixpath2
+            port:
+              number: 80
+        path: /prefix
+        pathType: Prefix
+      - backend:
+          service:
+            name: implpath
+            port:
+              number: 80
+        path: /impl
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: implpath2
+            port:
+              number: 80
+        path: /impl.+
+        pathType: ImplementationSpecific
+
+---
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exactpath
+  namespace: default
+  labels:
+    app: exactpath
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exactpath
+  template:
+    metadata:
+      labels:
+        app: exactpath
+    spec:
+      containers:
+      - name: exactpath
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          requests:
+            cpu: 10m
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prefixpath
+  namespace: default
+  labels:
+    app: prefixpath
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prefixpath
+  template:
+    metadata:
+      labels:
+        app: prefixpath
+    spec:
+      containers:
+      - name: prefixpath
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          requests:
+            cpu: 10m
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prefixpath2
+  namespace: default  
+  labels:
+    app: prefixpath2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prefixpath2
+  template:
+    metadata:
+      labels:
+        app: prefixpath2
+    spec:
+      containers:
+      - name: prefixpath2
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          requests:
+            cpu: 10m
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: implpath
+  namespace: default
+  labels:
+    app: implpath
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: implpath
+  template:
+    metadata:
+      labels:
+        app: implpath
+    spec:
+      containers:
+      - name: implpath
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          requests:
+            cpu: 10m
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: implpath2
+  namespace: default
+  labels:
+    app: implpath2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: implpath2
+  template:
+    metadata:
+      labels:
+        app: implpath2
+    spec:
+      containers:
+      - name: implpath2
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          requests:
+            cpu: 10m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prefixpath
+  namespace: default  
+spec:
+  type: ClusterIP
+  selector:
+    app: prefixpath
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prefixpath2
+  namespace: default  
+spec:
+  type: ClusterIP
+  selector:
+    app: prefixpath2
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: exactpath
+  namespace: default  
+spec:
+  type: ClusterIP
+  selector:
+    app: exactpath
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: implpath
+  namespace: default  
+spec:
+  type: ClusterIP
+  selector:
+    app: implpath
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: implpath2
+  namespace: default  
+spec:
+  type: ClusterIP
+  selector:
+    app: implpath2
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: echo
+  name: echo
+spec:
+  ports:
+  - port: 3000
+    name: high
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: echo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: echo
+  name: echo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echo
+  template:
+    metadata:
+      labels:
+        app: echo
+    spec:
+      containers:
+      - image: gcr.io/k8s-staging-ingressconformance/echoserver:v20221109-7ee2f3e
+        name: echo
+        ports:
+        - containerPort: 3000
+        env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: pod-worker
+  name: pod-worker
+spec:
+  containers:
+  - name: netshoot
+    image: nicolaka/netshoot:latest
+    command: ["sleep", "infinite"]
+
+
+---
+
+# TLS ingress example, requires the below two applications
+# https://raw.githubusercontent.com/istio/istio/release-1.11/samples/bookinfo/platform/kube/bookinfo.yaml
+# https://github.com/GoogleCloudPlatform/microservices-demo
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tls-ingress
+  namespace: default
+spec:
+  ingressClassName: cilium
+  rules:
+  - host: hipstershop.cilium.rocks
+    http:
+      paths:
+      - backend:
+          service:
+            name: productcatalogservice
+            port:
+              number: 3550
+        path: /hipstershop.ProductCatalogService
+        pathType: Prefix
+      - backend:
+          service:
+            name: currencyservice
+            port:
+              number: 7000
+        path: /hipstershop.CurrencyService
+        pathType: Prefix
+  - host: bookinfo.cilium.rocks
+    http:
+      paths:
+      - backend:
+          service:
+            name: details
+            port:
+              number: 9080
+        path: /details
+        pathType: Prefix
+      - backend:
+          service:
+            name: productpage
+            port:
+              number: 9080
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - bookinfo.cilium.rocks
+    - hipstershop.cilium.rocks
+    secretName: demo-cert

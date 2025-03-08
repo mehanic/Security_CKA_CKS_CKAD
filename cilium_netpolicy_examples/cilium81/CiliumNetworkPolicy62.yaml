@@ -1,0 +1,29 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "example-entity-policy"
+spec:
+  endpointSelector:
+    matchLabels:
+      app: web-server  # Selects pods with label app=web-server
+  ingress:
+    - fromEntities:
+        - cluster         # Allow traffic from all endpoints inside the local cluster
+        - kube-apiserver  # Allow traffic from the Kubernetes API server
+  egress:
+    - toEntities:
+        - world          # Allow outbound traffic to external endpoints
+        - host           # Allow communication with the host machine
+
+# Explanation:
+# endpointSelector: app=web-server → This policy applies to all pods with label app=web-server.
+# Ingress Rules (fromEntities):
+# Allows traffic from within the cluster (cluster).
+# Allows traffic from the Kubernetes API server (kube-apiserver).
+# Egress Rules (toEntities):
+# Allows outbound traffic to the internet (world).
+# Allows outbound traffic to the host machine (host).
+# Possible Use Cases:
+# Restricting ingress to only internal cluster traffic.
+# Allowing specific communication to external services.
+# Controlling pod-to-host interactions securely.

@@ -1,0 +1,19 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: "default-deny"
+spec:
+  endpointSelector: {}  # Applies to all pods
+  enableDefaultDeny:
+    ingress: true
+    egress: true
+
+# The EnableDefaultDeny field in a Cilium network policy is used to enforce a default deny-all behavior for ingress and/or egress traffic.
+
+# Purpose:
+# When EnableDefaultDeny is set, it ensures that all traffic is denied by default, and only explicitly allowed traffic (as defined in CiliumNetworkPolicy rules) is permitted.
+# This is useful for implementing a zero-trust security model, where all network communication is blocked unless explicitly defined.
+# How It Works:
+# By default, Cilium allows all traffic unless a policy restricts it.
+# Enabling EnableDefaultDeny ensures that any traffic not matching an explicit allow rule is dropped.
+# It can be applied to either ingress, egress, or both, depending on policy configuration.

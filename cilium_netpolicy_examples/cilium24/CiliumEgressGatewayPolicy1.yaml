@@ -1,0 +1,23 @@
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumEgressGatewayPolicy
+metadata:
+  name: "egress-policy-example"
+spec:
+  selectors:
+    - podSelector:
+        matchLabels:
+          role: backend  # Apply to pods with this label
+  destinationCIDRs:
+    - "0.0.0.0/0"  # Redirect all outbound traffic
+  egressGateway:
+    nodeSelector:
+      matchLabels:
+        egress-node: "true"  # Only nodes with this label act as gateways
+
+#The Cilium Egress Gateway allows Kubernetes pods to egress traffic through specific gateway nodes while maintaining source IP masquerading (NAT). This is useful for controlling outbound traffic, ensuring consistent source IPs, or enforcing security policies.
+
+# Key Features of Cilium Egress Gateway
+# Traffic Redirection: Routes egress traffic from selected pods through specific egress nodes.
+# Source IP Masquerading (NAT): Changes the source IP of packets to the egress node’s IP.
+# Policy-Based Routing: Uses CiliumEgressGatewayPolicy to define which traffic should be redirected.
+# Works with L4/L7 Policies: Can be combined with Cilium Network Policies for enhanced security.

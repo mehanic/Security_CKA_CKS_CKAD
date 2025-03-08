@@ -1,0 +1,13 @@
+SEC("xdp")
+int count_packets(struct __sk_buff *skb) {
+    __u16 protocol = load_half(skb, ETH_HLEN); // Get packet protocol
+    if (protocol == ETH_P_IP) {
+        __u8 ip_proto = load_byte(skb, ETH_HLEN + offsetof(struct iphdr, protocol));
+        if (ip_proto == IPPROTO_TCP) {
+            __sync_fetch_and_add(&tcp_count, 1);
+        } else if (ip_proto == IPPROTO_UDP) {
+            __sync_fetch_and_add(&udp_count, 1);
+        }
+    }
+    return XDP_PASS; // Allow packet processing
+}

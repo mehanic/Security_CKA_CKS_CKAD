@@ -1,0 +1,22 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "allow-egress-to-world"
+spec:
+  endpointSelector: {}  # Apply to all pods
+  egress:
+  - toEntities:
+    - world  # Allow access to the external world
+
+
+# In Cilium's Layer 3 policies, the entity that represents the collection of all endpoints outside of the cluster is:
+
+# world entity 🌍
+# Explanation:
+# The world entity in Cilium represents all external (non-cluster) endpoints.
+# This includes any IP addresses that are not part of the Kubernetes cluster, such as:
+# Internet destinations
+# External services (e.g., APIs, cloud services)
+# Public networks
+# Example: Allowing Pods to Access External Internet
+# If you want to allow all pods to access external websites or APIs, you can create a CiliumNetworkPolicy like this:
