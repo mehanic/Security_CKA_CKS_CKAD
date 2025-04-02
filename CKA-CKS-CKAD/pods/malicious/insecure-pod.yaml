@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: insecure-pod
+spec:
+ containers:
+ - name: insecure
+   image: busybox
+   command: ["sh", "-c", "sleep 2h"]
+ restartPolicy: Never
+

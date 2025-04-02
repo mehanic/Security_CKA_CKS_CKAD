@@ -1,0 +1,12 @@
+apiVersion: sql.gcp.kubedb.com/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.kubedb.com/example-id: sql/v1alpha1/database
+  labels:
+    testing.kubedb.com/example-name: example_database
+  name: example-database
+spec:
+  forProvider:
+    instanceRef:
+      name: example-instance

@@ -1,1 +1,0 @@
-sudo ./example10 --iface enp7s0
