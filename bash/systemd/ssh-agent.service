@@ -1,0 +1,11 @@
+[Unit]
+Description=SSH key agent (Janus)
+
+[Service]
+Type=simple
+Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
+ExecStart=/usr/local/bin/janus
+
+[Install]
+WantedBy=default.target
+
